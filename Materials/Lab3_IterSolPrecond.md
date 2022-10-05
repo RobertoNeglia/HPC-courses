@@ -85,7 +85,7 @@ using std::cout;
 #include "cg.hpp"                       // Include the template cg
 ```
 
-We test the conjugate gradient method on a tri-diagonal linear system assuming that the exact solution as all the coefficients equal to 1. The matrix `A` is built as follows:
+We test the conjugate gradient method on a tri-diagonal linear system assuming that the exact solution has all the coefficients equal to 1. The matrix `A` is built as follows:
 
 ```
 int main(int argc, char** argv)
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 Then, we set the parameters for the conjugate gradient routine (desired tolerance, initial guess, and maximum number of iterations allowed for convergence). As precoditioner we take the simple diagonal preconditioner provided by Eigen (also called the Jacobi preconditioner).
 
 ```
-double tol = 1.e-10;                // Convergence tolerance
+  double tol = 1.e-10;                // Convergence tolerance
   int result, maxit = 1000;           // Maximum iterations
 
   std::cout<<"Matrix size:"<<A.rows()<<"X"<<A.cols()<<endl;
