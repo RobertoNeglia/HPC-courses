@@ -1,93 +1,64 @@
+#include <Eigen/Sparse>
+#include <iostream>
 
-// namespace LinearAlgebra 
-// {
-//     template<class Matrix, class Vector, class Preconditioner>
-//     int Jacobi(const Matrix &A, Vector &x, const Vector &b, const Preconditioner &M, 
-//                 int &max_iter, typename Vector::Scalar &tol) {
-//         using Real = typename Matrix::Scalar;
+namespace LinearAlgebra {
 
-//         Real resid;
-//         Real normb = b.norm();
-//         Vector r = b - A * x;
+template <class M> void print_matrix(const M &m) {
+  using std::cout;
+  using std::endl;
 
-//         resid = r.norm();
-//         normb = b.norm();
+  cout << "[";
+  for (int i = 0; i < m.rows(); i++) {
+    for (int j = 0; j < m.cols(); j++) {
+      cout << "\t" << m.coeff(i, j);
+    }
+    if (i != m.rows() - 1)
+      cout << endl;
+  }
+  cout << "\t]" << endl;
+}
 
-//         if(normb == 0.0)
-//             normb = 1;
+template <class matrix, class vector, class preconditioner>
+// Jacobi iterative solver implementation
+// Function returns 1 if the solution is found before the max number of
+// iterations, 0 if not
+int jacobi(const matrix &A, vector &x, const vector &b, const preconditioner &p,
+           int &maxiter, typename vector::Scalar &tol, bool verbose) {
+  using real = typename matrix::Scalar;
+  real resid;
+  real normb = b.norm();
+  vector r = b - A * x;
 
-//         if((resid = r.norm() / normb) <= tol) {              // Solution already found
-//             tol = resid;
-//             max_iter = 0;
-//             return 0;
-//         }
-
-//         for(int i = 1; i <= max_iter; i++) {
-//             x = M.solve(r) + x;
-//             r = b - A * x;
-//             resid = r.norm(); 
-//             if((resid = r.norm() / normb) <= tol) {
-//                 tol = resid;
-//                 max_iter = i;
-//                 return 0;
-//             }
-//         }
-//         tol = resid;
-//         return 1;
-//     }
-// }
-
-//*****************************************************************
-// Iterative template routine -- Jacobi
-//
-// Jacobi solves the system Ax=b using the Jacobi method.
-//
-// The return value indicates convergence within max_iter (input)
-// iterations (0), or no convergence within max_iter iterations (1).
-//
-// Upon successful return, output arguments have the following values:
-//
-//        x  --  approximate solution to Ax = b
-// max_iter  --  the number of iterations performed before the
-//               tolerance was reached
-//      tol  --  the residual after the final iteration
-//
-//*****************************************************************
-
-namespace LinearAlgebra
-{
-template <class Matrix, class Vector, class Preconditioner>
-int Jacobi(const Matrix &A, Vector &x, const Vector &b, const Preconditioner &M,
-   int &max_iter, typename Vector::Scalar &tol)
-{
-  using Real = typename Matrix::Scalar;
-  Real   resid; 
-  Real   normb = b.norm();
-  Vector r = b - A * x;
-
-  if(normb == 0.0)
+  if (normb == 0)
     normb = 1;
 
-  if((resid = r.norm() / normb) <= tol)
-    {
-      tol = resid;
-      max_iter = 0;
-      return 0;
-    }
+  resid = r.norm() / normb;
 
-  for(int i = 1; i <= max_iter; i++)
-    {
-      x = M.solve(r) + x;
-      r = b - A * x;
-      if((resid = r.norm() / normb) <= tol)
-        {
-          tol = resid;
-          max_iter = i;
-          return 0;
-        }
+  if (resid < tol) {
+    // Already found the solution, end iterations
+    maxiter = 0;
+    tol = resid;
+    return 1;
+  }
+
+  for (int i = 0; i < maxiter; i++) {
+    x += p.solve(r);
+    r = b - A * x;
+    resid = r.norm() / normb;
+    // if (verbose) {
+    //   std::cout << "x" << i << ": " << std::endl;
+    //   print_matrix(x);
+    //   std::cout << "r" << i << ": " << std::endl;
+    //   print_matrix(r);
+    // }
+    if (resid < tol) {
+      maxiter = i;
+      tol = resid;
+      return 1;
     }
+  }
 
   tol = resid;
-  return 1;
+  return 0;
 }
 } // namespace LinearAlgebra
