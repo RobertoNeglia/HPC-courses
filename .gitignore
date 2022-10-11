@@ -3,3 +3,5 @@ Lis/lis*/
 
 # ignore object files
 **/*.out
+**/*.idea
+
