@@ -1,5 +1,5 @@
 # ignore Lis software library
-Lis/lis*/
+**/lis*/
 
 # ignore object files
 **/*.out
