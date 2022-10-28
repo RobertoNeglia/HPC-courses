@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
   loadMarket(A, matrixname);
 
   // Print matrix infos
+  //
   cout << "Matrix size: " << A.rows() << "x" << A.cols() << endl;
   cout << "Number of non-zero entries: " << A.nonZeros() << endl;
   SparseMatrix<double> B = SparseMatrix<double>(A.transpose()) - A;

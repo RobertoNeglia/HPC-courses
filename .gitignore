@@ -5,3 +5,8 @@
 **/*.out
 **/*.idea
 
+# ignore compressed files
+**/*.zip
+**/*.rar
+**/*.7z
+**/*.tar

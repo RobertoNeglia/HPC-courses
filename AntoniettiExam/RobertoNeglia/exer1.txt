@@ -1,0 +1,5 @@
+to compile the lis file
+mpicc -DUSE_MPI -I${mkLisInc} -L${mkLisLib} -llis test1.c -o test1
+
+to solve le linear system on 4 processors with cg and schwarz preconditioner
+mpirun -n 4 ./test1 diffreact.mtx 2 sol.txt hist.txt -i cg -adds_true
