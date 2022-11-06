@@ -10,6 +10,7 @@
 __constant__ unsigned char const_mask[MASK_SIZE * MASK_SIZE];
 
 __global__ void convolution_2D_basic_kernel(unsigned char *in,
+                                            unsigned char *mask,
                                             unsigned char *out, int maskwidth,
                                             int w, int h) {
   int col = blockIdx.x * blockDim.x + threadIdx.x;
@@ -29,7 +30,7 @@ __global__ void convolution_2D_basic_kernel(unsigned char *in,
 
         // Verify the image pixel is valid
         if (cur_row > -1 && cur_row < h && cur_col > -1 && cur_col < w)
-          pix_val += in[cur_row * w + cur_col] * const_mask[j * maskwidth + k];
+          pix_val += in[cur_row * w + cur_col] * mask[j * maskwidth + k];
       }
     }
     // Write new pixel out
@@ -130,8 +131,12 @@ int main(int argc, char **argv) {
       val += 2;
   }
 
-  cudaMemcpyToSymbol(const_mask, &m,
+  cudaMemcpyToSymbol(const_mask, m,
                      sizeof(unsigned char) * MASK_SIZE * MASK_SIZE);
+
+  cout << "The mask is in constant memory space on the device. (done only for "
+          "the tiled version to show the improvement from the basic kernel)"
+       << endl;
 
   // NO TILING KERNEL EXECUTION
 
@@ -154,8 +159,8 @@ int main(int argc, char **argv) {
        << " threads per block" << endl;
 
   cudaEventRecord(start_no_tiling, 0);
-  convolution_2D_basic_kernel<<<dimGrid, dimBlock>>>(n, p_no_tiling, MASK_SIZE,
-                                                     MATRIX_SIZE, MATRIX_SIZE);
+  convolution_2D_basic_kernel<<<dimGrid, dimBlock>>>(
+      n, m, p_no_tiling, MASK_SIZE, MATRIX_SIZE, MATRIX_SIZE);
   cudaDeviceSynchronize();
   cudaEventRecord(stop_no_tiling, 0);
   cudaEventSynchronize(stop_no_tiling);
