@@ -1,9 +1,14 @@
+*
+!*/
+!*.*
+
 # ignore Lis software library
 **/lis*/
 
 # ignore object files
 **/*.out
 **/*.idea
+**/*.vscode
 
 # ignore compressed files
 **/*.zip
