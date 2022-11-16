@@ -9,7 +9,7 @@
 #include "horner.hpp"
 
 int main(int argc, char** argv) {
-    bool verbose = 1;
+    bool verbose = 0;
 
     // int degree;
     // std::cout << "Polynomial degree: " << std::endl;
@@ -24,13 +24,13 @@ int main(int argc, char** argv) {
     const auto x_f = param.at("x_f");
 
     std::cout << "Coefficients are computed automatically (with 2sin(2k) function)" << std::endl;
-    if(verbose)
+    if (verbose)
         std::cout << "Equation: " << std::endl;
     std::vector<double> coeff(degree + 1);
-    for(int i = 0; i <= degree; i++) {
+    for (int i = 0; i <= degree; i++) {
         coeff[i] = 2 * std::sin(2 * i);
-        if(verbose) {    
-            if(i == 0)
+        if (verbose) {
+            if (i == 0)
                 std::cout << coeff[i];
             else
                 std::cout << " + (" << coeff[i] << ") * x^" << i;
@@ -49,14 +49,14 @@ int main(int argc, char** argv) {
     std::vector<double> points(n);
     const double h = (x_f - x_0) / n;
 
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         points[i] = x_0 + i * h;
 
     std::vector<double> naive_results(n);
     std::vector<double> recursive_horner_results(n);
     std::vector<double> iterative_horner_results(n);
 
-    if(verbose) {
+    if (verbose) {
 
         std::cout << "Computing " << n << " evaluations of polynomial with standard formula" << std::endl;
         {
@@ -99,24 +99,25 @@ int main(int argc, char** argv) {
 
             std::cout << "Time elapsed: " << diff << " [ms]" << std::endl;
         }
-    } else {
+    }
+    else {
         std::cout << "Computing " << n << " evaluations of polynomial with standard formula" << std::endl;
         std::cout << "Time elapsed: " << timeit([&]() {
             evaluate_poly(points, coeff, eval_x);
-        }) << std::endl;
+            }) << "[ms]" << std::endl;
 
         std::cout << "Computing " << n << " evaluations of polynomial with horner recursive formula" << std::endl;
         std::cout << "Time elapsed: " << timeit([&]() {
-            evaluate_poly(points, coeff, eval_horner_x_recursive); 
-        }) << std::endl;
+            evaluate_poly(points, coeff, eval_horner_x_recursive);
+            }) << "[ms]" << std::endl;
 
         std::cout << "Computing " << n << " evaluations of polynomial with horner iterative formula" << std::endl;
         std::cout << "Time elapsed: " << timeit([&]() {
             evaluate_poly(points, coeff, eval_horner_x_iterative);
-        }) << std::endl;
+            }) << "[ms]" << std::endl;
     }
 
-    if(verbose) {
+    if (verbose) {
         std::cout << "Coefficients: " << std::endl;
         print_vector(coeff);
 
@@ -130,9 +131,10 @@ int main(int argc, char** argv) {
         std::cout << "Horner (iterative) results: " << std::endl;
         print_vector(iterative_horner_results);
 
-        std::cout << "Diff vector norm: " << vector_norm(diff_vector(naive_results, recursive_horner_results)) << std::endl;
+        std::cout << "Diff vector norm: " << vector_norm(abs_diff_vector(naive_results, recursive_horner_results)) << std::endl;
 
-        std::cout << "Sanity check: " << std::endl << "naive results == Horner (recursive)? " << compare_vectors(naive_results, recursive_horner_results) << std::endl;
-        std::cout << "Sanity check: " << std::endl << "naive results == Horner (iterative)? " << compare_vectors(naive_results, iterative_horner_results) << std::endl;
+
     }
+    std::cout << "Sanity check: " << std::endl << "naive results == Horner (recursive)? " << compare_vectors(naive_results, recursive_horner_results) << std::endl;
+    std::cout << "Sanity check: " << std::endl << "naive results == Horner (iterative)? " << compare_vectors(naive_results, iterative_horner_results) << std::endl;
 }
