@@ -48,3 +48,5 @@
 **/*.rar
 **/*.7z
 **/*.tar
+
+PC/CUDA/ignore/
