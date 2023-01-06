@@ -1,3 +1,4 @@
+#include <omp.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,6 +50,19 @@ bottom_up_merge(float *input_data, int starting_cell, int size, float *output_da
     }
 }
 
+bool
+check_sort(const float *data, int size) {
+    if (size == 0 || size == 1) {
+      return true;
+  }
+
+    for (int i = 1; i < size; i++) {
+      if (data[i - 1] > data[i])
+        return false;
+    }
+  return true;
+}
+
 int
 main(int argc, char **argv) {
     if (argc != 3) {
@@ -70,8 +84,8 @@ main(int argc, char **argv) {
 
   /* Initialize data in a random way */
     for (index = 0; index < array_size; index++) {
-      unsigned int seed = index;
-      odd_data[index]   = rand_r(&seed) / (double)RAND_MAX;
+      unsigned int seed                = (index + 1) * 2;
+      odd_data[array_size - index - 1] = rand_r(&seed) / (double)RAND_MAX;
     }
 
     if (DEBUG) {
@@ -83,10 +97,15 @@ main(int argc, char **argv) {
       printf("\n");
   }
 
+#ifdef _OPENMP
+  const double start = omp_get_wtime();
+#else
   const clock_t start = clock();
+#endif
 
     while (width / 2 < array_size) {
       sequence_number = array_size / width + (array_size % width != 0 ? 1 : 0);
+#pragma omp parallel for num_threads(num_threads)
         for (unsigned int sequence = 0; sequence < sequence_number; sequence++) {
             /* Even iteration: the result is stored in even_data */
             if (iteration % 2 == 0) {
@@ -99,12 +118,24 @@ main(int argc, char **argv) {
       width = width * 2;
     }
 
-  const clock_t end = clock();
-  const double  dt  = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;
+#ifdef _OPENMP
+  const double end = omp_get_wtime();
+  const double dt  = (end - start) * 1000;
+#else
+  const clock_t end   = clock();
+  const double  dt    = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;
+#endif
 
   printf("Time elapsed: %f[ms]\n", dt);
 
   const float *final_data = iteration % 2 == 0 ? odd_data : even_data;
+
+    if (check_sort(final_data, array_size)) {
+      printf("Array has been correctly sorted\n");
+    } else {
+      printf("Array has not been correctly sorted\n");
+    }
+
     if (DEBUG) {
       /* Print the final result */
       printf("ordered array: \n");
@@ -113,7 +144,9 @@ main(int argc, char **argv) {
         }
       printf("\n");
   }
+
   free(odd_data);
   free(even_data);
+
   return 0;
 }

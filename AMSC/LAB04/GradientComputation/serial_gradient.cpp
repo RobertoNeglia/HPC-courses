@@ -23,19 +23,17 @@ compute_gradient(const std::function<double(const std::array<double, N> &)> &f,
 
 int
 main(int argc, char **argv) {
-  const int             n = 3;
-  std::array<double, n> x = {2, 3, 4};
+  const int             n = 2;
+  std::array<double, n> x = {10, 1000000};
 
   const std::function<double(const std::array<double, n> &)> f =
     [](auto x) { // just the sum of squares of every component
-      return std::transform_reduce(x.begin(), x.end(), 0.0, std::plus<>(), [](const double x) {
-        return x * x;
-      });
+      return x[0] + x[1];
     };
 
   double test = f(x);
 
-  std::cout << "function evaluated in point [2,3,4]: " << test << std::endl;
+  std::cout << "function evaluated in point [2,3]: " << test << std::endl;
 
   std::array<double, n> gradient = compute_gradient<n>(f, x, 1.e-6);
 

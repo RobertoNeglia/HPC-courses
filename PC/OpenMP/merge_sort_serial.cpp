@@ -1,12 +1,23 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+
+#include <chrono>
+#include <functional>
 
 #define DEBUG 0
 
+auto
+timeit(const std::function<void()> &f) {
+  using namespace std::chrono;
+  const auto start = high_resolution_clock::now();
+  f();
+  const auto end = high_resolution_clock::now();
+  return duration_cast<milliseconds>(end - start).count();
+}
+
 /*** The size of the array to be processed */
-unsigned int array_size = 0;
+unsigned long int array_size = 0;
 
 /**
  * Merge two arrays already sorted
@@ -16,25 +27,28 @@ unsigned int array_size = 0;
  * @param output_data is where result has to be stored
  */
 void
-bottom_up_merge(float *input_data, int starting_cell, int size, float *output_data) {
+bottom_up_merge(float            *input_data,
+                unsigned long int starting_cell,
+                unsigned long int size,
+                float            *output_data) {
   if (starting_cell > array_size)
     return;
 
   /*The last position to be written */
-  const int last_cell =
+  const unsigned long int last_cell =
     (starting_cell + size <= array_size) ? starting_cell + size : array_size;
 
   /*The position in the output data to be written */
-  int index = starting_cell;
+  unsigned long int index = starting_cell;
 
   /*The position in the left part of input data */
-  int left_index = starting_cell;
+  unsigned long int left_index = starting_cell;
 
   /*The position in the right part of input data */
-  int right_index = starting_cell + size / 2;
+  unsigned long int right_index = starting_cell + size / 2;
 
   /*The last position in the left part to be read*/
-  const int last_left = (right_index < last_cell) ? right_index : last_cell;
+  const unsigned long int last_left = (right_index < last_cell) ? right_index : last_cell;
 
     for (index = starting_cell; index < last_cell; index++) {
         if (left_index < last_left &&
@@ -55,18 +69,17 @@ main(int argc, char **argv) {
       printf("Wrong number of parameters\n");
       return 0;
   }
-  array_size               = (unsigned int)atoi(argv[1]);
-  unsigned int num_threads = (unsigned int)atoi(argv[2]);
+  array_size                    = (unsigned long int)atoi(argv[1]);
+  unsigned long int num_threads = (unsigned long int)atoi(argv[2]);
 
-  size_t size = array_size * sizeof(float);
+  float        even_data[array_size];
+  float        odd_data[array_size];
+  const float *final_data;
 
-  float *even_data = (float *)malloc(size);
-  float *odd_data  = (float *)malloc(size);
-
-  int          iteration = 0;
-  unsigned int index     = 0;
-  unsigned int width     = 2;
-  unsigned int sequence_number;
+  int               iteration = 0;
+  unsigned long int index     = 0;
+  unsigned long int width     = 2;
+  unsigned long int sequence_number;
 
   /* Initialize data in a random way */
     for (index = 0; index < array_size; index++) {
@@ -75,19 +88,17 @@ main(int argc, char **argv) {
     }
 
     if (DEBUG) {
-      /* Print the initial array */
-      printf("unordered array: \n");
+      printf("Unordered array: ");
         for (index = 0; index < array_size; index++) {
           printf("%f ", odd_data[index]);
         }
       printf("\n");
   }
 
-  const clock_t start = clock();
-
+  const auto dt = timeit([&]() {
     while (width / 2 < array_size) {
       sequence_number = array_size / width + (array_size % width != 0 ? 1 : 0);
-        for (unsigned int sequence = 0; sequence < sequence_number; sequence++) {
+        for (unsigned long int sequence = 0; sequence < sequence_number; sequence++) {
             /* Even iteration: the result is stored in even_data */
             if (iteration % 2 == 0) {
               bottom_up_merge(odd_data, sequence * width, width, even_data);
@@ -99,21 +110,18 @@ main(int argc, char **argv) {
       width = width * 2;
     }
 
-  const clock_t end = clock();
-  const double  dt  = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;
+  final_data = iteration % 2 == 0 ? odd_data : even_data;
+  });
 
-  printf("Time elapsed: %f[ms]\n", dt);
+  printf("Elapsed time: %ld[ms]\n", dt);
 
-  const float *final_data = iteration % 2 == 0 ? odd_data : even_data;
     if (DEBUG) {
-      /* Print the final result */
-      printf("ordered array: \n");
+      printf("Ordered array: ");
+        /* Print the final result */
         for (index = 0; index < array_size; index++) {
           printf("%f ", final_data[index]);
         }
       printf("\n");
   }
-  free(odd_data);
-  free(even_data);
   return 0;
 }
