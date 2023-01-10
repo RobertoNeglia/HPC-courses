@@ -86,7 +86,7 @@ Poisson1D::setup() {
 void
 Poisson1D::assemble() {
   std::cout << "==============================================" << std::endl;
-  std::cout << "Assembling the linear system" << std::endl;
+  std::cout << "  Assembling the linear system" << std::endl;
 
   // This is n_loc (number of local DoFs for each element)
   const unsigned int dofs_per_cell = fe->dofs_per_cell;
@@ -200,7 +200,7 @@ Poisson1D::solve() {
   // System matrix is SPD, use Conjugate Gradient
   SolverCG<Vector<double>> solver(solver_control);
 
-  std::cout << "Solving the linear system" << std::endl;
+  std::cout << "  Solving the linear system" << std::endl;
   // Do not use any preconditioner, use the identity
   solver.solve(system_matrix, system_solution, system_rhs, PreconditionIdentity());
   std::cout << solver_control.last_step() << "  CG iterations" << std::endl;
