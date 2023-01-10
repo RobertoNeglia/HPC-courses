@@ -32,55 +32,68 @@ using namespace dealii;
 /**
  * Class managing the differential problem.
  */
-class Poisson2D
-{
+class Poisson2D {
 public:
   // Physical dimension (1D, 2D, 3D)
-  static constexpr unsigned int dim = 1;
+  static constexpr unsigned int dim = 2;
 
   // Diffusion coefficient.
   // In deal.ii, functions are implemented by deriving the dealii::Function
   // class, which provides an interface for the computation of function values
   // and their derivatives.
-  class DiffusionCoefficient : public Function<dim>
-  {
+  class DiffusionCoefficient : public Function<dim> {
   public:
     // Constructor.
-    DiffusionCoefficient()
-    {}
+    DiffusionCoefficient() {}
 
     // Evaluation.
     virtual double
-    value(const Point<dim> & /*p*/, const unsigned int /*component*/ = 0) const
-    {
+    value(const Point<dim> & /*p*/, const unsigned int /*component*/ = 0) const {
       return 1.0;
     }
   };
 
   // Forcing term.
-  class ForcingTerm : public Function<dim>
-  {
+  class ForcingTerm : public Function<dim> {
   public:
     // Constructor.
-    ForcingTerm()
-    {}
+    ForcingTerm() {}
 
     // Evaluation.
     virtual double
-    value(const Point<dim> &p, const unsigned int /*component*/ = 0) const
-    {
-      if (p[0] <= 1.0 / 8 || p[0] > 1.0 / 4.0)
-        return 0.0;
-      else
-        return -1.0;
+    value(const Point<dim> &p, const unsigned int /*component*/ = 0) const {
+      return -5.0;
+    }
+  };
+
+  // Function G
+  class FunctionG : public Function<dim> {
+  public:
+    // Constructor
+    FunctionG() {}
+
+    // Evaluation
+    virtual double
+    value(const Point<dim> &p, const unsigned int /*component*/ = 0) const {
+      return p[0] + p[1];
+    }
+  };
+
+  // Function H
+  class FunctionH : public Function<dim> {
+  public:
+    // Constructor
+    FunctionH() {}
+
+    // Evaluation
+    virtual double
+    value(const Point<dim> &p, const unsigned int /*component*/ = 0) const {
+      return p[1];
     }
   };
 
   // Constructor.
-  Poisson2D(const unsigned int &N_, const unsigned int &r_)
-    : N(N_)
-    , r(r_)
-  {}
+  Poisson2D(const unsigned int &N_, const unsigned int &r_) : N(N_), r(r_) {}
 
   // Initialization.
   void
@@ -111,6 +124,12 @@ protected:
   // Forcing term.
   ForcingTerm forcing_term;
 
+  // Function G
+  FunctionG function_g;
+
+  // Function H
+  FunctionH function_h;
+
   // Triangulation.
   Triangulation<dim> mesh;
 
@@ -125,6 +144,10 @@ protected:
   // We use a unique_ptr here so that we can choose the type and order of the
   // quadrature formula at runtime (the order is a constructor parameter).
   std::unique_ptr<Quadrature<dim>> quadrature;
+
+  // Boundary condition quadrature formula
+  // RMK: the boundary is always a dimension smaller wrt the problem
+  std::unique_ptr<Quadrature<dim - 1>> quadrature_boundary;
 
   // DoF handler.
   DoFHandler<dim> dof_handler;

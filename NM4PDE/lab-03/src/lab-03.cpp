@@ -4,9 +4,8 @@
 
 // Main function.
 int
-main(int /*argc*/, char * /*argv*/[])
-{
-  const unsigned int N = 39;
+main(int /*argc*/, char * /*argv*/[]) {
+  const unsigned int N = 19;
   const unsigned int r = 1;
 
   Poisson2D problem(N, r);
