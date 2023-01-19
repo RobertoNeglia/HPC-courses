@@ -138,8 +138,7 @@ HeatNonLinear::assemble_system() {
 
                   // Non-linear stiffness matrix, first term.
                   cell_matrix(i, j) +=
-                    (mu_0_loc +
-                     2.0 * mu_1_loc * fe_values.shape_value(j, q) * solution_loc[q]) *
+                    (2.0 * mu_1_loc * fe_values.shape_value(j, q) * solution_loc[q]) *
                     scalar_product(solution_gradient_loc[q], fe_values.shape_grad(i, q)) *
                     fe_values.JxW(q);
 
