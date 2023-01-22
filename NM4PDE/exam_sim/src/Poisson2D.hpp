@@ -102,12 +102,14 @@ public:
     // Evaluation.
     virtual double
     value(const Point<dim> &p, const unsigned int /*component*/ = 0) const {
-      if (p[0] == 0 && p[1] > 0 && p[1] < 1)
-        return M_PI * p[1];
-      if (p[0] == 1 && p[1] > 0 && p[1] < 1)
-        return std::sin(M_PI * p[1]) - M_PI * p[1] * std::cos(M_PI * p[1]);
-      if (p[1] == 1 && p[0] > 0 && p[0] < 1)
-        return std::sin(M_PI * p[0]) - M_PI * p[0] * std::cos(M_PI * p[0]);
+        if (p[1] > 0.0 && p[1] < 1.0) {
+          if (p[0] == 0.0)
+            return M_PI * p[1];
+          else if (p[0] == 1.0)
+            return std::sin(M_PI * p[1]) - M_PI * p[1] * std::cos(M_PI * p[1]);
+        } else if (p[1] == 1 && (p[0] > 0.0 && p[0] < 1.0)) {
+          return std::sin(M_PI * p[0]) - M_PI * p[0] * std::cos(M_PI * p[0]);
+      }
       return 0.0;
     }
   };
