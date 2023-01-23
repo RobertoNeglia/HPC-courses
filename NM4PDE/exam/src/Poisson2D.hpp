@@ -89,7 +89,7 @@ public:
     // Evaluation.
     virtual double
     value(const Point<dim> &p, const unsigned int /*component*/ = 0) const {
-      return 1 - std::exp(p[0] + p[1]);
+      return 1.0 - std::exp(p[0] + p[1]);
     }
   };
 
@@ -103,9 +103,9 @@ public:
     virtual double
     value(const Point<dim> &p, const unsigned int /*component*/ = 0) const {
       if (p[0] == 1 && (p[1] > 0 && p[1] < 1))
-        return M_E * (std::exp(p[1] - 1));
-      if (p[1] == 1 && p[0] > 0 && p[1] < 1)
-        return M_E * (std::exp(p[0] - 1));
+        return M_E * (std::exp(p[1]) - 1);
+      if (p[1] == 1 && p[0] > 0 && p[0] < 1)
+        return M_E * (std::exp(p[0]) - 1);
     }
   };
 
