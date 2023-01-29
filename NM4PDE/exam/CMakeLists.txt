@@ -3,8 +3,8 @@ project(lab01 LANGUAGES CXX C)
 
 include(../common/cmake-common.cmake)
 
-add_executable(poisson_exam src/poisson_exam.cpp src/Poisson2D.cpp)
-deal_ii_setup_target(poisson_exam)
+add_executable(diffusion-reaction-exam src/diffusion-reaction-exam.cpp src/Poisson2D.cpp)
+deal_ii_setup_target(diffusion-reaction-exam)
 
-# add_executable(stokes_exam_sim src/stokes_exam_sim.cpp src/Stokes.cpp)
-# deal_ii_setup_target(stokes_exam_sim)
+add_executable(heat-equation-exam src/heat-equation-exam.cpp src/Heat.cpp)
+deal_ii_setup_target(heat-equation-exam)

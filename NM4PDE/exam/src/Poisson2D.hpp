@@ -106,6 +106,8 @@ public:
         return M_E * (std::exp(p[1]) - 1);
       if (p[1] == 1 && p[0] > 0 && p[0] < 1)
         return M_E * (std::exp(p[0]) - 1);
+
+      return 0.0;
     }
   };
 
