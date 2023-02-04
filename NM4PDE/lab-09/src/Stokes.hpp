@@ -45,9 +45,11 @@ public:
   public:
     virtual void
     vector_value(const Point<dim> & /*p*/, Vector<double> &values) const override {
+      // Velocity forcing term
       for (unsigned int i = 0; i < dim - 1; ++i)
         values[i] = 0.0;
 
+      // Pressure forcing term
       values[dim - 1] = -g;
     }
 
@@ -77,7 +79,8 @@ public:
     vector_value(const Point<dim> &p, Vector<double> &values) const override {
       values[0] = -alpha * p[1] * (2.0 - p[1]) * (1.0 - p[2]) * (2.0 - p[2]);
 
-      for (unsigned int i = 1; i < dim + 1; ++i)
+      for (unsigned int i = 1; i < dim + 1; ++i) // up to dim - 2 -> Velocity
+                                                 // dim - 1 -> pressure
         values[i] = 0.0;
     }
 

@@ -168,8 +168,8 @@ Stokes::assemble() {
   system_rhs    = 0.0;
   pressure_mass = 0.0;
 
-  FEValuesExtractors::Vector velocity(0);
-  FEValuesExtractors::Scalar pressure(dim);
+  FEValuesExtractors::Vector velocity(0);   // first three are for the velocity
+  FEValuesExtractors::Scalar pressure(dim); // last one for the pressure
 
     for (const auto &cell : dof_handler.active_cell_iterators()) {
       if (!cell->is_locally_owned())
@@ -206,7 +206,7 @@ Stokes::assemble() {
                   cell_matrix(i, j) -= fe_values[velocity].divergence(j, q) *
                                        fe_values[pressure].value(i, q) * fe_values.JxW(q);
 
-                  // Pressure mass matrix.
+                  // Pressure mass matrix. (for the preconditioners)
                   cell_pressure_mass_matrix(i, j) += fe_values[pressure].value(i, q) *
                                                      fe_values[pressure].value(j, q) /
                                                      nu * fe_values.JxW(q);
@@ -283,14 +283,15 @@ Stokes::solve() {
   SolverControl solver_control(2000, 1e-6 * system_rhs.l2_norm());
 
   SolverGMRES<TrilinosWrappers::MPI::BlockVector> solver(solver_control);
+  // SolverCG<TrilinosWrappers::MPI::BlockVector> solver(solver_control);
 
-  PreconditionBlockDiagonal preconditioner;
-  preconditioner.initialize(system_matrix.block(0, 0), pressure_mass.block(1, 1));
+  // PreconditionBlockDiagonal preconditioner;
+  // preconditioner.initialize(system_matrix.block(0, 0), pressure_mass.block(1, 1));
 
-  // PreconditionBlockTriangular preconditioner;
-  // preconditioner.initialize(system_matrix.block(0, 0),
-  //                           pressure_mass.block(1, 1),
-  //                           system_matrix.block(1, 0));
+  PreconditionBlockTriangular preconditioner;
+  preconditioner.initialize(system_matrix.block(0, 0),
+                            pressure_mass.block(1, 1),
+                            system_matrix.block(1, 0));
 
   pcout << "Solving the linear system" << std::endl;
   solver.solve(system_matrix, solution_owned, system_rhs, preconditioner);
