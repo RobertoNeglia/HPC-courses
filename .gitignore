@@ -49,4 +49,6 @@
 **/*.7z
 **/*.tar
 
-PC/CUDA/ignore/
+**/*.Rproj.user/*
+**/*.Rhistory
+**/*.Rproj

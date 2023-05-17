@@ -1,0 +1,34 @@
+"0-20" "21-40" "41-60" "61-80" "81+"
+"Caithness" 193 192 209 227 217
+"Sutherland" 628 561 507 456 389
+"Ross and Cromarty" 424 369 301 243 161
+"Inverness-shire" 307 288 268 236 231
+"Nairnshire" 176 248 268 319 354
+"County of Moray" 334 252 195 125 64
+"Banffshire" 265 274 260 300 284
+"Aberdeenshire" 198 208 191 198 215
+"Kincardineshire" 426 372 344 302 244
+"Angus" 252 235 212 189 150
+"Perthshire" 295 286 298 290 287
+"Argyll" 440 376 329 238 190
+"County of Bute" 427 371 325 285 216
+"Ayrshire" 326 346 409 421 470
+"Renfrewshire" 284 300 335 332 394
+"Dunbartonshire" 524 507 531 543 539
+"Stirlingshire" 211 283 343 406 504
+"Clackmannanshire" 428 378 322 303 278
+"Kinross-shire" 310 299 310 306 317
+"Fife" 148 220 285 365 419
+"East Lothian" 353 333 356 341 342
+"Midlothian" 205 210 225 231 240
+"West Lothian" 417 373 327 287 254
+"Lanarkshire" 262 285 316 307 333
+"Peeblesshire" 595 553 476 396 324
+"Selkirkshire" 288 326 368 380 435
+"Berwickshire" 395 370 300 248 202
+"Roxburghshire" 161 247 307 379 443
+"Dumfriesshire" 104 117 114 139 145
+"Kirkcudbrightshire" 325 336 326 337 356
+"Wigtownshire" 510 453 348 284 185
+"Zetland (Shetland)" 359 316 261 223 162
+"Orkney " 454 449 435 442 424
