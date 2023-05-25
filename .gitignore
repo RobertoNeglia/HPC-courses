@@ -52,3 +52,5 @@
 **/*.Rproj.user/*
 **/*.Rhistory
 **/*.Rproj
+
+HLS/
