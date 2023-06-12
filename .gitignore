@@ -53,5 +53,8 @@
 **/*.Rhistory
 **/*.Rproj
 
+**/handwriting_cnn/*
+**/*.h5
+
 HLS/
 NAML/NumericalAnalysisForMachineLearning.pdf
