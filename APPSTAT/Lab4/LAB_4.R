@@ -1256,7 +1256,14 @@ graphics.off()
 
 # _______________________________________________________________________________
 ### Example: analysis of a real dataset (dataset stiff)
+library(MVN)
+library(mvtnorm)
+library(car)
+library(mvnormtest)
 
+rm(list = ls())
+
+setwd("/home/rubuntu/HPC/APPSTAT/Lab4")
 stiff <- read.table("stiff.dat")
 head(stiff)
 dim(stiff)
@@ -1264,17 +1271,27 @@ dim(stiff)
 n <- dim(stiff)[1]
 p <- dim(stiff)[2]
 
-
 plot(stiff, pch = 19)
-
 dev.off()
 
+d_mahalanobis <- matrix(mahalanobis(stiff, colMeans(stiff), cov(stiff)))
+stiff_wo_outliers <- stiff[which(d_mahalanobis <= 8), ]
+
+plot(stiff_wo_outliers, pch = 19)
+
+par(mfrow = c(1, 2))
+qqnorm(stiff[, 1], pch = 19)
+qqline(stiff[, 1])
+qqnorm(stiff_wo_outliers[, 1], pch = 19)
+qqline(stiff_wo_outliers[, 1])
+
+dev.off()
 ### Normality test
 mvn(stiff)$multivariateNormality
 mvn(stiff_wo_outliers)$multivariateNormality
 
-n <- dim(stiff_wo_outliers)[1]
-p <- dim(stiff_wo_outliers)[2]
+n <- dim(stiff)[1]
+p <- dim(stiff)[2]
 
 ### Test for the mean of level 5%
 ### --------------------------------
@@ -1286,19 +1303,24 @@ mu0 <- c(1850, 1750, 1500, 1700)
 alpha <- 0.05
 
 # 2) Compute the test statistics
-x.mean <- colMeans(stiff_wo_outliers)
-x.cov <- cov(stiff_wo_outliers)
+x.mean <- colMeans(stiff)
+x.cov <- cov(stiff)
 x.invcov <- solve(x.cov)
 
 x.T2 <- n * (x.mean - mu0) %*% x.invcov %*% (x.mean - mu0)
+x.T2
 
 # 3a) Verify if the test statistics belongs to the rejection region
 cfr.fisher <- ((n - 1) * p / (n - p)) * qf(1 - alpha, p, n - p)
-x.T2 < cfr.fisher # we accept H0 at 5%
+x.T2 < cfr.fisher
+# we accept H0 at 5%
 
 # 3b) Compute the p-value
 P <- 1 - pf(x.T2 * (n - p) / ((n - 1) * p), p, n - p)
 P
+# P is 13.5%: if H0 is true, we have a 13.5% chance of observing a value of T2
+# that is bigger as the one we observed
+# To reject H0, with this data, we need an alpha > 13.5%
 
 ### Confidence region for the mean of level 95%
 ### ------------------------------------------------------------
@@ -1313,10 +1335,16 @@ x.mean
 
 # Directions of the principal axes:
 eigen(x.cov / n)$vectors
+# sqrt of the eigenvalues (these are the singular values of the dataset):
+sqrt(eigen(x.cov / n)$values)
 
 # Length of the semi-axes of the ellipse:
 r <- sqrt(cfr.fisher)
 r * sqrt(eigen(x.cov / n)$values)
+# The confidence region is an ellipsoid centered in x.mean and with semi-axes
+# of length r * sqrt(eigen(x.cov / n)$values) along the directions of the
+# eigenvectors of x.cov / n (i.e., the directions of the principal axes)
+# https://en.wikipedia.org/wiki/Ellipsoid
 
 # Question: how to plot the confidence region?
 # (I don't know how to plot in R^4!)
@@ -1332,6 +1360,14 @@ r * sqrt(eigen(x.cov / n)$values)
 ### with global level 95%
 ### ----------------------------------------------------
 
+# Compute the confidence intervals for the mean of each component
+# We're basically computing the simultaneous confidence intervals
+# for each component of the mean, which means we're computing the simultaneous
+# confidence intervals for each linear combination a' * mu, with a vector of
+# the canonical basis of R^4 (one for each component)
+# -> this is why I'm considering only the diagonal elements of the covariance
+#   matrix of the mean
+
 T2 <- cbind(
    inf = x.mean - sqrt(cfr.fisher * diag(x.cov) / n),
    center = x.mean,
@@ -1346,7 +1382,7 @@ matplot(
    1:4,
    1:4,
    pch = "",
-   ylim = range(stiff_wo_outliers),
+   ylim = range(stiff),
    xlab = "Variables",
    ylab = "T2 for a component",
    main = "Simultaneous T2 conf. int. for the components"
@@ -1360,10 +1396,17 @@ points(1:4, T2[, 2], pch = 16, col = 1:4)
 # We add it to the plot
 points(1:4, mu0, lwd = 3, col = "orange")
 
-# Yes, it is, because it is inside all the T2-intervals,
+# Yes, it is, because it is inside all the T2-intervals
+# With the simultaneous confidence intervals, we are saying that
 
 ### Bonferroni intervals on the components of the mean
 ### with global level 95%
+# Simultaneous confidence intervals are too wide (we're covering all possible
+# linear combinations of the components of the mean, all with exactly the same
+# confidence level (95%))
+# -> we can use Bonferroni intervals, which are narrower (we're fixing the
+#   linear combination we're interested in, i.e. k linear combinations, and
+#   we know that the overall confidence level is more than 95%)
 ### ----------------------------------------------------
 k <- p
 cfr.t <- qt(1 - alpha / (k * 2), n - 1)
@@ -1381,12 +1424,13 @@ matplot(
    1:4,
    1:4,
    pch = "",
-   ylim = range(stiff_wo_outliers),
+   ylim = range(stiff),
    xlab = "Variables",
    ylab = "Confidence intervals along a component",
    main = "Confidence intervals"
 )
 
+# Plot the simultaneous confidence intervals
 for (i in 1:4) {
    segments(i,
       T2[i, 1],
@@ -1400,6 +1444,7 @@ for (i in 1:4) {
 points(1:4, T2[, 1], pch = "-", col = "grey35")
 points(1:4, T2[, 3], pch = "-", col = "grey35")
 
+# Plot the Bonferroni confidence intervals
 for (i in 1:4) {
    segments(i, Bf[i, 1], i, Bf[i, 3], lwd = 2, col = i)
 }
@@ -1412,5 +1457,107 @@ points(1:4, Bf[, 3], pch = "-", col = 1:4)
 points(1:4, mu0, lwd = 3, col = "orange")
 
 # Yes, it is, because it belongs to all the intervals along the components
+
+# RMK: in general the Bonferroni intervals are narrower than the simultaneous,
+# and hence we can't assure that if mu0 is inside the simultaneous confidence
+# intervals, then they will be inside the Bonferroni intervals.
+
+graphics.off()
+
+# Do the same for the dataset without outliers
+
+n <- dim(stiff_wo_outliers)[1]
+p <- dim(stiff_wo_outliers)[2]
+
+x.mean <- colMeans(stiff_wo_outliers)
+x.cov <- cov(stiff_wo_outliers)
+x.invcov <- solve(x.cov)
+
+x.T2 <- n * (x.mean - mu0) %*% x.invcov %*% (x.mean - mu0)
+x.T2
+
+cfr.fisher <- ((n - 1) * p / (n - p)) * qf(1 - alpha, p, n - p)
+x.T2 < cfr.fisher
+# accept at global level alpha = 0.05
+
+# compute the p-value
+P <- 1 - pf(x.T2 * (n - p) / ((n - 1) * p), p, n - p)
+P
+
+eigen(x.cov / n)$vectors
+sqrt(eigen(x.cov / n)$values)
+
+r <- sqrt(cfr.fisher)
+r * sqrt(eigen(x.cov / n)$values)
+
+T2 <- cbind(
+   inf = x.mean - sqrt(cfr.fisher * diag(x.cov) / n),
+   center = x.mean,
+   sup = x.mean + sqrt(cfr.fisher * diag(x.cov) / n)
+)
+T2
+
+matplot(
+   1:4,
+   1:4,
+   pch = "",
+   ylim = range(stiff_wo_outliers),
+   xlab = "Variables",
+   ylab = "T2 for a component",
+   main = "Simultaneous T2 conf. int. for the components"
+)
+for (i in 1:4) {
+   segments(i, T2[i, 1], i, T2[i, 3], lwd = 3, col = i)
+}
+points(1:4, T2[, 2], pch = 16, col = 1:4)
+points(1:4, mu0, lwd = 3, col = "orange")
+
+graphics.off()
+
+k <- p
+cfr.t <- qt(1 - alpha / (k * 2), n - 1)
+
+Bf <- cbind(
+   inf = x.mean - cfr.t * sqrt(diag(x.cov) / n),
+   center = x.mean,
+   sup = x.mean + cfr.t * sqrt(diag(x.cov) / n)
+)
+Bf
+
+matplot(
+   1:4,
+   1:4,
+   pch = "",
+   ylim = range(stiff_wo_outliers),
+   xlab = "Variables",
+   ylab = "Confidence intervals along a component",
+   main = "Confidence intervals"
+)
+
+# Plot the simultaneous confidence intervals
+for (i in 1:4) {
+   segments(i,
+      T2[i, 1],
+      i,
+      T2[i, 3],
+      lwd = 2,
+      col = "grey35",
+      lty = 3
+   )
+}
+points(1:4, T2[, 1], pch = "-", col = "grey35")
+points(1:4, T2[, 3], pch = "-", col = "grey35")
+
+# Plot the Bonferroni confidence intervals
+for (i in 1:4) {
+   segments(i, Bf[i, 1], i, Bf[i, 3], lwd = 2, col = i)
+}
+points(1:4, Bf[, 2], pch = 16, col = 1:4)
+points(1:4, Bf[, 1], pch = "-", col = 1:4)
+points(1:4, Bf[, 3], pch = "-", col = 1:4)
+
+# Is mu0 inside the Bonferroni confidence region?
+# we add it to the plot
+points(1:4, mu0, lwd = 3, col = "orange")
 
 graphics.off()
