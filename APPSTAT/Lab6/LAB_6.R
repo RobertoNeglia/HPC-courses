@@ -519,7 +519,7 @@ round(S3, digits = 1)
 # especially if we have a high number of samples
 summary(boxM(iris4, species.name))
 # p-value is very small -> reject the null hypothesis of homogeneity of covariance matrices
-# very stron evidence that the covariance matrices are not the same
+# very strong evidence that the covariance matrices are not the same
 # -> anyway this won't be a problem for the MANOVA test
 # Other way to compare: heatmap on the covariance matrices
 
