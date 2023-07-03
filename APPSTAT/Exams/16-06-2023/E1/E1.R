@@ -17,7 +17,7 @@
 #    Given the confidence level, what is the final number of groups that should
 #    be considered?
 
-setwd("~/HPC/APPSTAT/Exams/16-06-2023")
+setwd("~/HPC/APPSTAT/Exams/16-06-2023/E1")
 data <- read.table("noise.txt", header = TRUE)
 
 head(data)
@@ -197,7 +197,6 @@ df.res # RMK: this is the same as aov.fuel$df.residual
 
 S <- SS.res / df.res
 S
-
 # This is the estimate of the variance
 
 SS.treat <- sum((M.fuel - M)^2) * n.g
