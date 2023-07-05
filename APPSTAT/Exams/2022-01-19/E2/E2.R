@@ -152,6 +152,7 @@ for (k in ks) {
 
 plot(ks, AERCV)
 ks[which(min(AERCV) == AERCV)]
+AERCV[which(min(AERCV) == AERCV)]
 
 plot(coords[where.low, ], col = "red", pch = 19, xlab = "x", ylab = "y")
 points(coords[where.high, ], col = "blue", pch = 19)

@@ -1,0 +1,21 @@
+"artist" "album" "price" "media.condition"
+"The Clash" "London Calling" 25.34 7.9
+"Enya" "May It Be" 30.34 7.52
+"Pink Floyd" "The Dark Side of the Moon" 24.05 9.12
+"Dire Straits" "Brothers in Arms" 40.42 4.77
+"Sex Pistols" "Never Mind The Bollocks" 34.62 6.17
+"Ramones" "End Of The Century" 25.49 11.09
+"Joy Division" "Closer" 28.05 6.28
+"Bruce Springsteen" "Born To Run" 27.29 7.86
+"Jethro Tull" "Living With The Past" 33.24 3.44
+"Queen" "The Miracle" 29.75 8.29
+"The Beatles" "Please Please Me" 29.5 7.58
+"The Doors" "Live In New York" 27.93 8.26
+"Guns N' Roses" "Greatest Hits" 27.95 6.02
+"Red Hot Chili Peppers" "Unlimited Love" 37.42 9.43
+"Nick Cave & The Bad Seeds" "Skeleton Tree" 27.6 9.06
+"The Offspring" "Americana" 37.51 8.27
+"Green Day" "Nimrod" 23.2 10.86
+"Dead Kennedys" "Fresh Fruit For Rotting Vegetables" 33.7 10.39
+"Metallica" "Master Of Puppets" 30.79 10.24
+"Led Zeppelin" "Led Zeppelin III" 30.12 6.76
