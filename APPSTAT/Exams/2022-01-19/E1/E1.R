@@ -42,7 +42,6 @@ Spooled
 # Test H0: mu1 - mu2 = c(0, 0) vs H1: mu1 - mu2 != c(0, 0)
 alpha <- 0.01
 diff <- c(0, 0)
-
 Spooled.inv <- solve(Spooled)
 
 T2 <- n1 * n2 / (n1 + n2) * (city1.mean - city2.mean - diff) %*% Spooled.inv %*% (city1.mean - city2.mean - diff)
@@ -63,7 +62,7 @@ p.value
 # for the second component
 k <- 2
 
-qT <- qt(1 - alpha / k, n1 + n2 - 2)
+qT <- qt(1 - alpha / (2 * k), n1 + n2 - 2)
 qT
 
 BC.I <- cbind(
